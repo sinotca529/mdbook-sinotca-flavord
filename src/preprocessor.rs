@@ -30,9 +30,9 @@ impl Preprocessor for Prep {
     }
 }
 
-fn split_inclusive(string: &str, separator: &str, escape_backslash: bool) -> Vec<String> {
+fn split_inclusive(string: &str, delimiter: &str, escape_backslash: bool) -> Vec<String> {
     if escape_backslash {
-        let mut splitted = string.split_inclusive(separator);
+        let mut splitted = string.split_inclusive(delimiter);
         let mut current_substr = splitted.next();
         let mut result = Vec::new();
 
@@ -50,7 +50,7 @@ fn split_inclusive(string: &str, separator: &str, escape_backslash: bool) -> Vec
         result
     }
     else {
-        string.split_inclusive(separator)
+        string.split_inclusive(delimiter)
         .map(|substr| substr.to_string())
         .collect()
     }
@@ -61,7 +61,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn split_inclusive_test1() {
+    fn split_inclusive_test() {
         let s = r"foo\$a\$b$x$";
         assert_eq!(
             split_inclusive(s, "$", true),
@@ -70,9 +70,7 @@ mod tests {
                 s[10..].to_string()   // x$
             ]
         );
-    }
-    #[test]
-    fn split_inclusive_test2() {
+
         let s = r"$x$";
         assert_eq!(
             split_inclusive(s, "$", true),
@@ -81,10 +79,7 @@ mod tests {
                 s[1..].to_string()   // x$
             ]
         );
-    }
 
-    #[test]
-    fn split_inclusive_test3() {
         let s = r"foo\$a\$b$x$";
         assert_eq!(
             split_inclusive(s, "$", false),
