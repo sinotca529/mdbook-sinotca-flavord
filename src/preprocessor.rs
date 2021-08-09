@@ -79,6 +79,9 @@ fn split_inclusive(string: &str, delimiter: &str, escape_backslash: bool) -> Vec
                 if let Some(next) = current_substr {
                     substr.push_str(next);
                 }
+                else {
+                    break;
+                }
             }
             result.push(substr);
             current_substr = splitted.next();
@@ -98,6 +101,14 @@ mod tests {
 
     #[test]
     fn split_inclusive_test() {
+        let s = r"don't escape → \\, _, \$ \\ \$";
+        assert_eq!(
+            split_inclusive(s, "$", true),
+            vec![
+                s.to_string(),
+            ]
+        );
+
         let s = r"foo\$a\$b$x$";
         assert_eq!(
             split_inclusive(s, "$", true),
@@ -130,6 +141,12 @@ mod tests {
 
     #[test]
     fn escape_special_chars_for_mathjax_test() {
+        let s = r"don't escape → \\, _, \$ \\ \$";
+        assert_eq!(
+            Prep::escape_special_chars_for_mathjax(s),
+            s.to_string()
+        );
+
         let s = r"$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\ &= \sigma (1 + x) \end{align}$";
         assert_eq!(
             Prep::escape_special_chars_for_mathjax(s),
