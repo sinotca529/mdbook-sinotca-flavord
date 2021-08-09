@@ -1,4 +1,4 @@
-use mdbook::book::Book;
+use mdbook::book::{Book, BookItem};
 use mdbook::errors::Error;
 use mdbook::preprocess::{Preprocessor, PreprocessorContext};
 
@@ -51,18 +51,18 @@ impl Preprocessor for Prep {
         super::PREPROCESSOR_NAME
     }
 
-    fn run(&self, ctx: &PreprocessorContext, book: Book) -> Result<Book, Error> {
-        if let Some(nop_cfg) = ctx.config.get_preprocessor(self.name()) {
-            if nop_cfg.contains_key("blow-up") {
-                anyhow::bail!("Boom!1!");
+    fn run(&self, _ctx: &PreprocessorContext, mut book: Book) -> Result<Book, Error> {
+        book.for_each_mut(|item| {
+            if let BookItem::Chapter(chapter) = item {
+                chapter.content = Self::escape_special_chars_for_mathjax(&chapter.content);
             }
-        }
+        });
 
         Ok(book)
     }
 
     fn supports_renderer(&self, renderer: &str) -> bool {
-        renderer != "not-supported"
+        renderer == "html"
     }
 }
 
