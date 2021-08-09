@@ -10,6 +10,42 @@ impl Prep {
     }
 }
 
+// for mathjax
+impl Prep {
+    /// Convert
+    /// - `\\` surrounded by `$$` or `$` to `\\\\`
+    /// - `_` surrounded by `$$` or `$` to `\_`
+    /// You can use backslash to escape delimiter `$`
+    fn escape_special_chars_for_mathjax(content: &str) -> String {
+        let escape_display = Self::escape_special_chars_for_mathjax_with_delimiter(content, "$$");
+        Self::escape_special_chars_for_mathjax_with_delimiter(&escape_display, "$")
+    }
+
+    /// Convert
+    /// - `\\` surrounded by `delimiter` to `\\\\`
+    /// - `_` surrounded by `$$` or `$` to `\_`
+    /// You can use backslash to escape delimiter `$`
+    fn escape_special_chars_for_mathjax_with_delimiter(content: &str, delimiter: &str) -> String {
+        split_inclusive(content, delimiter, true)
+            .into_iter()
+            .enumerate()
+            .map(|(n, substr)| {
+                if n % 2 == 0 {
+                    substr
+                }
+                else {
+                    substr
+                        .replace(r"\\", r"\\\\")
+                        .replace(r"_", r"\_")
+                }
+            })
+            .fold(String::new(), |mut acc, substr| {
+                acc.push_str(&substr);
+                acc
+            })
+    }
+}
+
 impl Preprocessor for Prep {
     fn name(&self) -> &str {
         super::PREPROCESSOR_NAME
@@ -89,6 +125,33 @@ mod tests {
                 s[8..10].to_string(), //b$
                 s[10..].to_string()   // x$
             ]
+        );
+    }
+
+    #[test]
+    fn escape_special_chars_for_mathjax_test() {
+        let s = r"$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\ &= \sigma (1 + x) \end{align}$";
+        assert_eq!(
+            Prep::escape_special_chars_for_mathjax(s),
+            r"$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\\\ &= \sigma (1 + x) \end{align}$".to_string()
+        );
+
+        let s = r"$$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\ &= \sigma (1 + x) \end{align}$$";
+        assert_eq!(
+            Prep::escape_special_chars_for_mathjax(s),
+            r"$$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\\\ &= \sigma (1 + x) \end{align}$$".to_string()
+        );
+
+        let s = r"$t_n=max({t_{rap}}_n,{t_{tar}}_{n}+t_{mis}\frac{{t_{res}}_n}{t_{res}})$";
+        assert_eq!(
+            Prep::escape_special_chars_for_mathjax(s),
+            r"$t\_n=max({t\_{rap}}\_n,{t\_{tar}}\_{n}+t\_{mis}\frac{{t\_{res}}\_n}{t\_{res}})$".to_string()
+        );
+
+        let s = r"\$←ドルマーク。$\bm{x}$です。$$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\ &= \sigma (1 + x) \end{align}$$いぇい";
+        assert_eq!(
+            Prep::escape_special_chars_for_mathjax(s),
+            r"\$←ドルマーク。$\bm{x}$です。$$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\\\ &= \sigma (1 + x) \end{align}$$いぇい".to_string()
         );
     }
 }
