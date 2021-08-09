@@ -9,9 +9,9 @@ So, I implement preprocesses which I want into this one preprocessor.
 # Function
 ✔-mark indicates implemented function.
 
-- [　] Convert some characters for the usability of MathJax
-    - [　] convert `\\` surrounded by `$` to `\\\\`
-    - [　] convert `_`  surrounded by `$` to `\_`
+- [✔] Convert some characters for the usability of MathJax
+    - [✔] convert `\\` surrounded by `$` or `$$` to `\\\\`
+    - [✔] convert `_`  surrounded by `$` or `$$`to `\_`
 - [　] Useful syntax for html's `details`
 
 # Additional Markdown Syntax
