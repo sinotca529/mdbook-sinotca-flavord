@@ -32,11 +32,8 @@ impl Prep {
             .map(|(n, substr)| {
                 if n % 2 == 0 {
                     substr
-                }
-                else {
-                    substr
-                        .replace(r"\\", r"\\\\")
-                        .replace(r"_", r"\_")
+                } else {
+                    substr.replace(r"\\", r"\\\\").replace(r"_", r"\_")
                 }
             })
             .fold(String::new(), |mut acc, substr| {
@@ -78,8 +75,7 @@ fn split_inclusive(string: &str, delimiter: &str, escape_backslash: bool) -> Vec
                 current_substr = splitted.next();
                 if let Some(next) = current_substr {
                     substr.push_str(next);
-                }
-                else {
+                } else {
                     break;
                 }
             }
@@ -87,11 +83,11 @@ fn split_inclusive(string: &str, delimiter: &str, escape_backslash: bool) -> Vec
             current_substr = splitted.next();
         }
         result
-    }
-    else {
-        string.split_inclusive(delimiter)
-        .map(|substr| substr.to_string())
-        .collect()
+    } else {
+        string
+            .split_inclusive(delimiter)
+            .map(|substr| substr.to_string())
+            .collect()
     }
 }
 
@@ -102,12 +98,7 @@ mod tests {
     #[test]
     fn split_inclusive_test() {
         let s = r"don't escape → \\, _, \$ \\ \$";
-        assert_eq!(
-            split_inclusive(s, "$", true),
-            vec![
-                s.to_string(),
-            ]
-        );
+        assert_eq!(split_inclusive(s, "$", true), vec![s.to_string(),]);
 
         let s = r"foo\$a\$b$x$";
         assert_eq!(
@@ -131,8 +122,8 @@ mod tests {
         assert_eq!(
             split_inclusive(s, "$", false),
             vec![
-                s[0..5].to_string(), // foo\$
-                s[5..8].to_string(), // a\$
+                s[0..5].to_string(),  // foo\$
+                s[5..8].to_string(),  // a\$
                 s[8..10].to_string(), //b$
                 s[10..].to_string()   // x$
             ]
@@ -142,12 +133,10 @@ mod tests {
     #[test]
     fn escape_special_chars_for_mathjax_test() {
         let s = r"don't escape → \\, _, \$ \\ \$";
-        assert_eq!(
-            Prep::escape_special_chars_for_mathjax(s),
-            s.to_string()
-        );
+        assert_eq!(Prep::escape_special_chars_for_mathjax(s), s.to_string());
 
-        let s = r"$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\ &= \sigma (1 + x) \end{align}$";
+        let s =
+            r"$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\ &= \sigma (1 + x) \end{align}$";
         assert_eq!(
             Prep::escape_special_chars_for_mathjax(s),
             r"$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\\\ &= \sigma (1 + x) \end{align}$".to_string()
@@ -162,7 +151,8 @@ mod tests {
         let s = r"$t_n=max({t_{rap}}_n,{t_{tar}}_{n}+t_{mis}\frac{{t_{res}}_n}{t_{res}})$";
         assert_eq!(
             Prep::escape_special_chars_for_mathjax(s),
-            r"$t\_n=max({t\_{rap}}\_n,{t\_{tar}}\_{n}+t\_{mis}\frac{{t\_{res}}\_n}{t\_{res}})$".to_string()
+            r"$t\_n=max({t\_{rap}}\_n,{t\_{tar}}\_{n}+t\_{mis}\frac{{t\_{res}}\_n}{t\_{res}})$"
+                .to_string()
         );
 
         let s = r"\$←ドルマーク。$\bm{x}$です。$$\begin{align} f &= \sigma (x + 1) \label{eq:hoge} \\ &= \sigma (1 + x) \end{align}$$いぇい";
