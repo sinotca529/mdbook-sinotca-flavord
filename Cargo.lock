@@ -778,7 +778,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mdbook-sinotca-flavord"
+name = "mdbook-sinotca-flavored"
 version = "0.1.0"
 dependencies = [
  "anyhow",
