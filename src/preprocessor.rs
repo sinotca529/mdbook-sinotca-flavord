@@ -12,18 +12,20 @@ impl Prep {
 
 // for mathjax
 impl Prep {
-    /// Convert
-    /// - `\\` surrounded by `$$` or `$` to `\\\\`
-    /// - `_` surrounded by `$$` or `$` to `\_`
+    /// Convert followings (surrounded by `$$` or `$`)
+    /// - `\\` to `\\\\`
+    /// - `_` to `\_`
+    /// - `\{`, `\}` to `\\{`, `\\}`
     /// You can use backslash to escape delimiter `$`
     fn escape_special_chars_for_mathjax(content: &str) -> String {
         let escape_display = Self::escape_special_chars_for_mathjax_with_delimiter(content, "$$");
         Self::escape_special_chars_for_mathjax_with_delimiter(&escape_display, "$")
     }
 
-    /// Convert
-    /// - `\\` surrounded by `delimiter` to `\\\\`
-    /// - `_` surrounded by `$$` or `$` to `\_`
+    /// Convert followings (surrounded by `delimiter`)
+    /// - `\\`  to `\\\\`
+    /// - `_` to `\_`
+    /// - `\{`, `\}` to `\\{`, `\\}`
     /// You can use backslash to escape delimiter `$`
     fn escape_special_chars_for_mathjax_with_delimiter(content: &str, delimiter: &str) -> String {
         split_inclusive(content, delimiter, true)
@@ -33,7 +35,11 @@ impl Prep {
                 if n % 2 == 0 {
                     substr
                 } else {
-                    substr.replace(r"\\", r"\\\\").replace(r"_", r"\_")
+                    substr
+                        .replace(r"\\", r"\\\\")
+                        .replace(r"_", r"\_")
+                        .replace(r"\{", r"\\{")
+                        .replace(r"\}", r"\\}")
                 }
             })
             .fold(String::new(), |mut acc, substr| {
